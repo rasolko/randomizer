@@ -101,13 +101,20 @@ function App() {
                         maxHeight: 300,
                     }}>
                         {activities.map(el => {
-                            return <ListItem key={el.id}>
+                            return <ListItem style={{
+                                width: '300px',
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                            }} key={el.id}>
                                 <ListItemAvatar>
                                     <Avatar>
                                         {el.owner === 'Ксюша' ? <FaceRetouchingNaturalIcon/> : <BoyIcon/>}
                                     </Avatar>
                                 </ListItemAvatar>
                                 <ListItemText primary={el.name}></ListItemText>
+                                <ListItemText style={{
+                                    textAlign: 'right',
+                                }}  primary={el.counter}></ListItemText>
                             </ListItem>
                         })}
                     </List>
