@@ -4,7 +4,7 @@ import s from './App.module.css';
 import {
     Avatar,
     Button,
-    createTheme, FormControl, InputLabel,
+    createTheme, FormControl, IconButton, InputLabel,
     List,
     ListItem, ListItemAvatar,
     ListItemText, MenuItem,
@@ -15,6 +15,7 @@ import {
 import CssBaseline from '@mui/material/CssBaseline';
 import BoyIcon from '@mui/icons-material/Boy';
 import FaceRetouchingNaturalIcon from '@mui/icons-material/FaceRetouchingNatural';
+import {Delete} from '@mui/icons-material';
 
 type ActivitiesType = {
     id: string
@@ -83,6 +84,9 @@ function App() {
         setActivities([...activities.map((el, i) => i === pos ? {...el, counter: el.counter + 1} : el)]);
         setResult(activities[pos]);
     }
+    const removeItem = (id: string) => {
+        setActivities([...activities.filter(el => el.id !== id)]);
+    }
     const darkTheme = createTheme({
         palette: {
             mode: 'dark',
@@ -115,6 +119,11 @@ function App() {
                                 <ListItemText style={{
                                     textAlign: 'right',
                                 }}  primary={el.counter}></ListItemText>
+                                <IconButton
+                                    size={'small'}
+                                    onClick={() => removeItem(el.id)}>
+                                    <Delete/>
+                                </IconButton>
                             </ListItem>
                         })}
                     </List>
