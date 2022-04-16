@@ -102,7 +102,7 @@ function App() {
                 <div className={s.container}>
                     <List sx={{
                         overflow: 'auto',
-                        maxHeight: 300,
+                        maxHeight: 650,
                     }}>
                         {activities.map(el => {
                             return <ListItem style={{
