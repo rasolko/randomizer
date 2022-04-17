@@ -59,6 +59,7 @@ function App() {
     let [inputOwnerValue, setInputOwnerValue] = useState<string>('');
     let [error, setError] = useState<string | null>(null);
     let [result, setResult] = useState<ActivitiesType | null>(null);
+    let [funny, setFunny] = useState<number | null>(null);
     const addNew = () => {
         if (inputActivityValue.trim() !== '' && inputOwnerValue !== '') {
             setActivities([...activities, {
@@ -84,10 +85,11 @@ function App() {
         setInputOwnerValue(e.target.value);
     }
     const randomizer = () => {
-        let length = activities.filter(el => !el.isDone).length;
-        let pos = Math.floor(Math.random() * length);
-        setActivities([...activities.map((el, i) => i === pos ? {...el, counter: el.counter + 1} : el)]);
-        setResult(activities[pos]);
+        funnyRandomizer();
+        // let length = activities.filter(el => !el.isDone).length;
+        // let pos = Math.floor(Math.random() * length);
+        // setActivities([...activities.map((el, i) => i === pos ? {...el, counter: el.counter + 1} : el)]);
+        // setResult(activities[pos]);
     }
     const removeItem = (id: string) => {
         setActivities([...activities.filter(el => el.id !== id)]);
@@ -101,8 +103,22 @@ function App() {
             } else {
                 setActivities([newItem, ...activities.filter(el => el.id !== id)]);
             }
-
         }
+    }
+    const funnyRandomizer = () => {
+        let length = activities.filter(el => !el.isDone).length;
+        let pos: number;
+        const interval = setInterval(() => {
+            pos = Math.floor(Math.random() * length);
+            setFunny(pos);
+        }, 200);
+        setTimeout(() => {
+            clearInterval(interval);
+            if (pos) {
+                setActivities([...activities.map((el, i) => i === pos ? {...el, counter: el.counter + 1} : el)]);
+                setResult(activities[pos]);
+            }
+        }, 5000);
     }
     const darkTheme = createTheme({
         palette: {
@@ -116,7 +132,7 @@ function App() {
                 <Grid container spacing={2} sx={{
                     padding: '8px',
                 }}>
-                    {activities.map(el => {
+                    {activities.map((el, i) => {
                         const onChangeItemStatusHandler = (e: ChangeEvent<HTMLInputElement>) => {
                             onChangeItemStatus(el.id, e.currentTarget.checked);
                         }
@@ -127,7 +143,10 @@ function App() {
                                 alignItems: 'center',
                                 backgroundColor: '#1A2027',
                                 padding: '5px 0',
-                            }} className={el.isDone ? s.isDone : ''}>
+                            }}
+                                   className={(el.isDone ? s.isDone : '') + (i === funny ? 'MuiPaper-root' : '')}
+                                   style={i === funny ? {backgroundColor: "deeppink"} : {}}
+                            >
                                 <Checkbox
                                     onChange={onChangeItemStatusHandler}
                                     checked={el.isDone}
