@@ -1,9 +1,11 @@
 
 .container {
+    width: 300px;
     display: flex;
     flex-direction: column;
     align-items: center;
     padding: 10px;
+    margin: auto;
 }
 .isDone {
     opacity: 0.5;

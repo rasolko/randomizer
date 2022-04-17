@@ -143,37 +143,38 @@ function App() {
                                     <Delete/>
                                 </IconButton>
                             </Paper>
-
                         </Grid>
                     })}
                 </Grid>
-                <TextField
-                    fullWidth
-                    error={error ? true : false}
-                    id="standard-basic"
-                    label="Activity"
-                    variant="standard"
-                    value={inputActivityValue}
-                    onChange={onChangeActivityHandler}
-                    helperText={error}
-                />
-                <FormControl fullWidth margin="normal">
-                    <InputLabel id="demo-simple-select-label">Owner</InputLabel>
-                    <Select
+                <div className={s.container}>
+                    <TextField
                         error={error ? true : false}
-                        labelId="demo-simple-select-label"
-                        id="demo-simple-select"
-                        value={inputOwnerValue}
-                        label="Owner"
-                        onChange={onChangeOwnerHandler}
-                    >
-                        <MenuItem value={'Ксюша'}>Ксюша</MenuItem>
-                        <MenuItem value={'Ваня'}>Ваня</MenuItem>
-                    </Select>
-                </FormControl>
-                <Button onClick={() => addNew()}>
-                    Добавить
-                </Button>
+                        id="standard-basic"
+                        label="Activity"
+                        variant="standard"
+                        value={inputActivityValue}
+                        onChange={onChangeActivityHandler}
+                        helperText={error}
+                        fullWidth
+                    />
+                    <FormControl fullWidth margin="normal">
+                        <InputLabel id="demo-simple-select-label">Owner</InputLabel>
+                        <Select
+                            error={error ? true : false}
+                            labelId="demo-simple-select-label"
+                            id="demo-simple-select"
+                            value={inputOwnerValue}
+                            label="Owner"
+                            onChange={onChangeOwnerHandler}
+                        >
+                            <MenuItem value={'Ксюша'}>Ксюша</MenuItem>
+                            <MenuItem value={'Ваня'}>Ваня</MenuItem>
+                        </Select>
+                    </FormControl>
+                    <Button onClick={() => addNew()}>
+                        Добавить
+                    </Button>
+                </div>
                 <Paper style={{
                     width: '300px',
                     margin: '10px auto'
