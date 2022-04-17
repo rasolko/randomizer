@@ -124,6 +124,7 @@ function App() {
                             <Paper sx={{
                                 display: 'flex',
                                 justifyContent: 'space-between',
+                                alignItems: 'center',
                                 backgroundColor: '#1A2027',
                                 padding: '5px 0',
                             }} className={el.isDone ? s.isDone : ''}>
@@ -135,7 +136,6 @@ function App() {
                                     {el.owner === 'Ксюша' ? <FaceRetouchingNaturalIcon/> : <BoyIcon/>}
                                 </Avatar>
                                 <Typography margin={"auto"} align={"center"}>{el.name}</Typography>
-
                                 <Typography margin={"auto"} align={"right"}>{el.counter}</Typography>
                                 <IconButton
                                     size={'small'}
