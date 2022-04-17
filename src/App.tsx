@@ -1,4 +1,4 @@
-import React, {ChangeEvent, useEffect, useState} from 'react';
+import React, {ChangeEvent, LegacyRef, useEffect, useReducer, useRef, useState} from 'react';
 import {v1} from 'uuid';
 import s from './App.module.css';
 import {
@@ -16,6 +16,8 @@ import CssBaseline from '@mui/material/CssBaseline';
 import BoyIcon from '@mui/icons-material/Boy';
 import FaceRetouchingNaturalIcon from '@mui/icons-material/FaceRetouchingNatural';
 import {Delete} from '@mui/icons-material';
+import {AudioPlayerProvider, useAudioPlayer} from "react-use-audio-player";
+const path = require('./assets/audio/sound7.mp3');
 
 type ActivitiesType = {
     id: string
@@ -84,13 +86,6 @@ function App() {
         setError(null);
         setInputOwnerValue(e.target.value);
     }
-    const randomizer = () => {
-        funnyRandomizer();
-        // let length = activities.filter(el => !el.isDone).length;
-        // let pos = Math.floor(Math.random() * length);
-        // setActivities([...activities.map((el, i) => i === pos ? {...el, counter: el.counter + 1} : el)]);
-        // setResult(activities[pos]);
-    }
     const removeItem = (id: string) => {
         setActivities([...activities.filter(el => el.id !== id)]);
     }
@@ -105,12 +100,13 @@ function App() {
             }
         }
     }
-    const funnyRandomizer = () => {
+    const randomizer = () => {
         let length = activities.filter(el => !el.isDone).length;
         let pos: number;
         const interval = setInterval(() => {
             pos = Math.floor(Math.random() * length);
             setFunny(pos);
+            playSound();
         }, 200);
         setTimeout(() => {
             clearInterval(interval);
@@ -119,6 +115,18 @@ function App() {
                 setResult(activities[pos]);
             }
         }, 5000);
+    }
+    const playSound = () => {
+        let sound = new Audio(path);
+        const playPromise = sound.play();
+        if (playPromise !== undefined) {
+            playPromise.then(function() {
+                // Automatic playback started!
+            }).catch(function(error) {
+                // Automatic playback failed.
+                // Show a UI element to let the user manually start playback.
+            });
+        }
     }
     const darkTheme = createTheme({
         palette: {
@@ -219,5 +227,4 @@ function App() {
         </ThemeProvider>
     )
 }
-
 export default App;
