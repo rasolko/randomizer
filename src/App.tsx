@@ -1,4 +1,4 @@
-import React, {ChangeEvent, LegacyRef, useEffect, useReducer, useRef, useState} from 'react';
+import React, {ChangeEvent, useEffect, useState} from 'react';
 import {v1} from 'uuid';
 import s from './App.module.css';
 import {
@@ -16,7 +16,6 @@ import CssBaseline from '@mui/material/CssBaseline';
 import BoyIcon from '@mui/icons-material/Boy';
 import FaceRetouchingNaturalIcon from '@mui/icons-material/FaceRetouchingNatural';
 import {Delete} from '@mui/icons-material';
-import {AudioPlayerProvider, useAudioPlayer} from "react-use-audio-player";
 const path = require('./assets/audio/sound7.mp3');
 
 type ActivitiesType = {
