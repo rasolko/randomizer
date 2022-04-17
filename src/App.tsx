@@ -2,15 +2,15 @@ import React, {ChangeEvent, useEffect, useState} from 'react';
 import {v1} from 'uuid';
 import s from './App.module.css';
 import {
-    Avatar,
-    Button,
-    createTheme, FormControl, IconButton, InputLabel,
+    Avatar, Box,
+    Button, Checkbox,
+    createTheme, FormControl, Grid, IconButton, InputLabel,
     List,
     ListItem, ListItemAvatar,
     ListItemText, MenuItem,
     Paper, Select, SelectChangeEvent,
     TextField,
-    ThemeProvider
+    ThemeProvider, Typography
 } from '@mui/material';
 import CssBaseline from '@mui/material/CssBaseline';
 import BoyIcon from '@mui/icons-material/Boy';
@@ -22,6 +22,7 @@ type ActivitiesType = {
     name: string
     owner: string
     counter: number
+    isDone: boolean
 }
 
 function App() {
@@ -31,12 +32,14 @@ function App() {
             name: 'Fairytale',
             owner: 'Ксюша',
             counter: 0,
+            isDone: false,
         },
         {
             id: v1(),
             name: 'One piece',
             owner: 'Ваня',
             counter: 0,
+            isDone: false,
         },
     ]);
     useEffect(() => {
@@ -63,6 +66,7 @@ function App() {
                 name: inputActivityValue,
                 owner: inputOwnerValue,
                 counter: 0,
+                isDone: false
             }])
             setInputActivityValue('');
             setInputOwnerValue('');
@@ -80,12 +84,25 @@ function App() {
         setInputOwnerValue(e.target.value);
     }
     const randomizer = () => {
-        let pos = Math.floor(Math.random() * activities.length);
+        let length = activities.filter(el => !el.isDone).length;
+        let pos = Math.floor(Math.random() * length);
         setActivities([...activities.map((el, i) => i === pos ? {...el, counter: el.counter + 1} : el)]);
         setResult(activities[pos]);
     }
     const removeItem = (id: string) => {
         setActivities([...activities.filter(el => el.id !== id)]);
+    }
+    const onChangeItemStatus = (id: string, isDone: boolean) => {
+        let item = activities.find((el) => el.id === id);
+        if (item) {
+            let newItem = {...item, isDone};
+            if (isDone) {
+                setActivities([...activities.filter(el => el.id !== id), newItem]);
+            } else {
+                setActivities([newItem, ...activities.filter(el => el.id !== id)]);
+            }
+
+        }
     }
     const darkTheme = createTheme({
         palette: {
@@ -95,90 +112,92 @@ function App() {
     return (
         <ThemeProvider theme={darkTheme}>
             <CssBaseline/>
-            <Paper style={{
-                width: '300px',
-                margin: '10px auto'
-            }} elevation={5}>
-                <div className={s.container}>
-                    <List sx={{
-                        overflow: 'auto',
-                        maxHeight: 650,
-                    }}>
-                        {activities.map(el => {
-                            return <ListItem style={{
-                                width: '300px',
+            <Box sx={{flexGrow: 1}}>
+                <Grid container spacing={2} sx={{
+                    padding: '8px',
+                }}>
+                    {activities.map(el => {
+                        const onChangeItemStatusHandler = (e: ChangeEvent<HTMLInputElement>) => {
+                            onChangeItemStatus(el.id, e.currentTarget.checked);
+                        }
+                        return <Grid item xs={2} key={el.id}>
+                            <Paper sx={{
                                 display: 'flex',
                                 justifyContent: 'space-between',
-                            }} key={el.id}>
-                                <ListItemAvatar>
-                                    <Avatar>
-                                        {el.owner === 'Ксюша' ? <FaceRetouchingNaturalIcon/> : <BoyIcon/>}
-                                    </Avatar>
-                                </ListItemAvatar>
-                                <ListItemText primary={el.name}></ListItemText>
-                                <ListItemText style={{
-                                    textAlign: 'right',
-                                }}  primary={el.counter}></ListItemText>
+                                backgroundColor: '#1A2027',
+                                padding: '5px 0',
+                            }} className={el.isDone ? s.isDone : ''}>
+                                <Checkbox
+                                    onChange={onChangeItemStatusHandler}
+                                    checked={el.isDone}
+                                />
+                                <Avatar>
+                                    {el.owner === 'Ксюша' ? <FaceRetouchingNaturalIcon/> : <BoyIcon/>}
+                                </Avatar>
+                                <Typography margin={"auto"} align={"center"}>{el.name}</Typography>
+
+                                <Typography margin={"auto"} align={"right"}>{el.counter}</Typography>
                                 <IconButton
                                     size={'small'}
                                     onClick={() => removeItem(el.id)}>
                                     <Delete/>
                                 </IconButton>
-                            </ListItem>
-                        })}
-                    </List>
-                    <TextField
-                        fullWidth
+                            </Paper>
+
+                        </Grid>
+                    })}
+                </Grid>
+                <TextField
+                    fullWidth
+                    error={error ? true : false}
+                    id="standard-basic"
+                    label="Activity"
+                    variant="standard"
+                    value={inputActivityValue}
+                    onChange={onChangeActivityHandler}
+                    helperText={error}
+                />
+                <FormControl fullWidth margin="normal">
+                    <InputLabel id="demo-simple-select-label">Owner</InputLabel>
+                    <Select
                         error={error ? true : false}
-                        id="standard-basic"
-                        label="Activity"
-                        variant="standard"
-                        value={inputActivityValue}
-                        onChange={onChangeActivityHandler}
-                        helperText={error}
-                    />
-                    <FormControl fullWidth margin="normal">
-                        <InputLabel id="demo-simple-select-label">Owner</InputLabel>
-                        <Select
-                            error={error ? true : false}
-                            labelId="demo-simple-select-label"
-                            id="demo-simple-select"
-                            value={inputOwnerValue}
-                            label="Owner"
-                            onChange={onChangeOwnerHandler}
-                        >
-                            <MenuItem value={'Ксюша'}>Ксюша</MenuItem>
-                            <MenuItem value={'Ваня'}>Ваня</MenuItem>
-                        </Select>
-                    </FormControl>
-                    <Button onClick={() => addNew()}>
-                        Добавить
-                    </Button>
-                </div>
-            </Paper>
-            <Paper style={{
-                width: '300px',
-                margin: '10px auto'
-            }} elevation={5}>
-                <div className={s.container}>
-                    <Button onClick={randomizer}>Хоть бы вовка</Button>
-                    {result
-                        ? <List>
-                            <ListItem key={result.id}>
-                                <ListItemAvatar>
-                                    <Avatar>
-                                        {result.owner === 'Ксюша' ? <FaceRetouchingNaturalIcon/> : <BoyIcon/>}
-                                    </Avatar>
-                                </ListItemAvatar>
-                                <ListItemText primary={result.name}></ListItemText>
-                            </ListItem>
-                        </List>
-                        : 'Результат'
-                    }
-                </div>
-            </Paper>
+                        labelId="demo-simple-select-label"
+                        id="demo-simple-select"
+                        value={inputOwnerValue}
+                        label="Owner"
+                        onChange={onChangeOwnerHandler}
+                    >
+                        <MenuItem value={'Ксюша'}>Ксюша</MenuItem>
+                        <MenuItem value={'Ваня'}>Ваня</MenuItem>
+                    </Select>
+                </FormControl>
+                <Button onClick={() => addNew()}>
+                    Добавить
+                </Button>
+                <Paper style={{
+                    width: '300px',
+                    margin: '10px auto'
+                }} elevation={5}>
+                    <div className={s.container}>
+                        <Button onClick={randomizer}>Хоть бы вовка</Button>
+                        {result
+                            ? <List>
+                                <ListItem key={result.id}>
+                                    <ListItemAvatar>
+                                        <Avatar>
+                                            {result.owner === 'Ксюша' ? <FaceRetouchingNaturalIcon/> : <BoyIcon/>}
+                                        </Avatar>
+                                    </ListItemAvatar>
+                                    <ListItemText primary={result.name}></ListItemText>
+                                </ListItem>
+                            </List>
+                            : 'Результат'
+                        }
+                    </div>
+                </Paper>
+            </Box>
         </ThemeProvider>
-    );
+    )
 }
 
 export default App;
