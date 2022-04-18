@@ -4,10 +4,10 @@ import s from './App.module.css';
 import {
     Avatar, Box,
     Button, Checkbox,
-    createTheme, FormControl, Grid, IconButton, InputLabel,
+    createTheme, FormControl, Grid, IconButton, Input, InputLabel,
     List,
     ListItem, ListItemAvatar,
-    ListItemText, MenuItem,
+    ListItemText, MenuItem, Modal,
     Paper, Select, SelectChangeEvent,
     TextField,
     ThemeProvider, Typography
@@ -16,6 +16,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import BoyIcon from '@mui/icons-material/Boy';
 import FaceRetouchingNaturalIcon from '@mui/icons-material/FaceRetouchingNatural';
 import {Delete} from '@mui/icons-material';
+import BasicModal from "./BasicModal";
 const path = require('./assets/audio/sound7.mp3');
 
 type ActivitiesType = {
@@ -127,6 +128,33 @@ function App() {
             });
         }
     }
+    const exportData = () => {
+        const jsonString = `data:text/json;chatset=utf-8,${encodeURIComponent(
+            JSON.stringify(activities)
+        )}`;
+        const link = document.createElement("a");
+        link.href = jsonString;
+        link.download = "data.json";
+        link.click();
+    };
+    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const fileReader = new FileReader();
+        if (e.target.files) {
+            fileReader.readAsText(e.target.files[0], "UTF-8");
+        }
+        fileReader.onload = e => {
+            if (e.target) {
+                if (typeof e.target.result === "string") {
+                    console.log("e.target.result", JSON.parse(e.target.result));
+                    setActivities([...JSON.parse(e.target.result)]);
+                    setToLocaleStorage();
+                }
+            }
+        };
+    };
+    const [open, setOpen] = React.useState(false);
+    const handleOpen = () => setOpen(true);
+    const handleClose = () => setOpen(false);
     const darkTheme = createTheme({
         palette: {
             mode: 'dark',
@@ -223,6 +251,14 @@ function App() {
                     </div>
                 </Paper>
             </Box>
+            <BasicModal>
+                <div className={s.container}>
+                    <Button onClick={exportData}>
+                        Export Data
+                    </Button>
+                    <Input type="file" name="f" onChange={handleChange}/>
+                </div>
+            </BasicModal>
         </ThemeProvider>
     )
 }
