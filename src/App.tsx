@@ -144,7 +144,6 @@ function App() {
         fileReader.onload = e => {
             if (e.target) {
                 if (typeof e.target.result === "string") {
-                    console.log("e.target.result", JSON.parse(e.target.result));
                     setAffairs({...JSON.parse(e.target.result)});
                     setToLocaleStorage();
                 }
