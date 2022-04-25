@@ -2,135 +2,134 @@ import React, {ChangeEvent, useEffect, useState} from 'react';
 import {v1} from 'uuid';
 import s from './App.module.css';
 import {
-    Avatar, Box,
-    Button, Checkbox,
-    createTheme, FormControl, Grid, IconButton, Input, InputLabel,
+    Box,
+    Button,
+    createTheme, Grid, Input,
     List,
-    ListItem, ListItemAvatar,
-    ListItemText, MenuItem, Modal,
-    Paper, Select, SelectChangeEvent,
+    ListItem,
+    ListItemText,
+    Paper,
     TextField,
     ThemeProvider, Typography
 } from '@mui/material';
 import CssBaseline from '@mui/material/CssBaseline';
-import BoyIcon from '@mui/icons-material/Boy';
-import FaceRetouchingNaturalIcon from '@mui/icons-material/FaceRetouchingNatural';
-import {Delete} from '@mui/icons-material';
 import BasicModal from "./BasicModal";
-const path = require('./assets/audio/sound7.mp3');
+import {Affair} from "./Affair";
+import {ChangeItemForm} from "./ChangeItemForm";
 
-type ActivitiesType = {
+export type AffairType = {
     id: string
     name: string
-    owner: string
     counter: number
     isDone: boolean
 }
+export type AffairsType = {
+    [key: string]: Array<AffairType>
+}
 
 function App() {
-    let [activities, setActivities] = useState<Array<ActivitiesType>>([
-        {
-            id: v1(),
-            name: 'Fairytale',
-            owner: 'Ксюша',
-            counter: 0,
-            isDone: false,
-        },
-        {
-            id: v1(),
-            name: 'One piece',
-            owner: 'Ваня',
-            counter: 0,
-            isDone: false,
-        },
-    ]);
+    let [chosenAffairs, setChosenAffairs] = useState<string>('Activities');
+    let [affairs, setAffairs] = useState<AffairsType>({
+            ['Activities']: [
+                {
+                    id: v1(),
+                    name: 'Fairytale',
+                    counter: 0,
+                    isDone: false,
+                },
+                {
+                    id: v1(),
+                    name: 'One piece',
+                    counter: 0,
+                    isDone: false,
+                },
+            ],
+            ['Code']: [
+                {
+                    id: v1(),
+                    name: 'Путь самурая',
+                    counter: 0,
+                    isDone: false,
+                },
+                {
+                    id: v1(),
+                    name: 'Todolist',
+                    counter: 0,
+                    isDone: false,
+                },
+            ],
+        }
+    );
     useEffect(() => {
-        let valueAsString = localStorage.getItem('activities');
+        let valueAsString = localStorage.getItem('affairs');
         if (valueAsString) {
             let result = JSON.parse(valueAsString);
-            setActivities(result);
+            setAffairs(result);
         }
     }, [])
     useEffect(() => {
         setToLocaleStorage();
-    }, [activities])
+    }, [affairs])
     const setToLocaleStorage = () => {
-        localStorage.setItem('activities', JSON.stringify(activities));
+        localStorage.setItem('affairs', JSON.stringify(affairs));
     }
-    let [inputActivityValue, setInputActivityValue] = useState<string>('');
-    let [inputOwnerValue, setInputOwnerValue] = useState<string>('');
+    let [inputAffairValue, setInputAffairValue] = useState<string>('');
     let [error, setError] = useState<string | null>(null);
-    let [result, setResult] = useState<ActivitiesType | null>(null);
+    let [result, setResult] = useState<AffairType | null>(null);
     let [funny, setFunny] = useState<number | null>(null);
     const addNew = () => {
-        if (inputActivityValue.trim() !== '' && inputOwnerValue !== '') {
-            setActivities([...activities, {
+        if (inputAffairValue.trim() !== '') {
+            setAffairs({...affairs,
+                [chosenAffairs]: [{
                 id: v1(),
-                name: inputActivityValue,
-                owner: inputOwnerValue,
+                name: inputAffairValue,
                 counter: 0,
                 isDone: false
-            }])
-            setInputActivityValue('');
-            setInputOwnerValue('');
+            }, ...affairs[chosenAffairs]]});
+            setInputAffairValue('');
             setToLocaleStorage();
+            setFunny(null);
+            setResult(null);
         } else {
             setError('Заполни все поля');
         }
     }
-    const onChangeActivityHandler = (e: ChangeEvent<HTMLInputElement>) => {
+    const onChangeAffairHandler = (e: ChangeEvent<HTMLInputElement>) => {
         setError(null);
-        setInputActivityValue(e.currentTarget.value);
-    }
-    const onChangeOwnerHandler = (e: SelectChangeEvent<string>) => {
-        setError(null);
-        setInputOwnerValue(e.target.value);
+        setInputAffairValue(e.currentTarget.value);
     }
     const removeItem = (id: string) => {
-        setActivities([...activities.filter(el => el.id !== id)]);
+        setAffairs({...affairs, [chosenAffairs]: affairs[chosenAffairs].filter(el => el.id !== id)});
     }
     const onChangeItemStatus = (id: string, isDone: boolean) => {
-        let item = activities.find((el) => el.id === id);
+        let item = affairs[chosenAffairs].find((el) => el.id === id);
         if (item) {
             let newItem = {...item, isDone};
             if (isDone) {
-                setActivities([...activities.filter(el => el.id !== id), newItem]);
+                setAffairs({...affairs, [chosenAffairs]: [...affairs[chosenAffairs].filter(el => el.id !== id), newItem]});
             } else {
-                setActivities([newItem, ...activities.filter(el => el.id !== id)]);
+                setAffairs({...affairs, [chosenAffairs]: [newItem, ...affairs[chosenAffairs].filter(el => el.id !== id)]});
             }
         }
     }
     const randomizer = () => {
-        let length = activities.filter(el => !el.isDone).length;
+        let length = affairs[chosenAffairs].filter(el => !el.isDone).length;
         let pos: number;
         const interval = setInterval(() => {
             pos = Math.floor(Math.random() * length);
             setFunny(pos);
-            playSound();
         }, 200);
         setTimeout(() => {
             clearInterval(interval);
-            if (pos) {
-                setActivities([...activities.map((el, i) => i === pos ? {...el, counter: el.counter + 1} : el)]);
-                setResult(activities[pos]);
+            if (pos >= 0) {
+                setAffairs({...affairs, [chosenAffairs]: affairs[chosenAffairs].map((el, i) => i === pos ? {...el, counter: el.counter + 1} : el)});
+                setResult(affairs[chosenAffairs][pos]);
             }
         }, 5000);
     }
-    const playSound = () => {
-        let sound = new Audio(path);
-        const playPromise = sound.play();
-        if (playPromise !== undefined) {
-            playPromise.then(function() {
-                // Automatic playback started!
-            }).catch(function(error) {
-                // Automatic playback failed.
-                // Show a UI element to let the user manually start playback.
-            });
-        }
-    }
     const exportData = () => {
-        const jsonString = `data:text/json;chatset=utf-8,${encodeURIComponent(
-            JSON.stringify(activities)
+        const jsonString = `data:text/json;charset=utf-8,${encodeURIComponent(
+            JSON.stringify(affairs)
         )}`;
         const link = document.createElement("a");
         link.href = jsonString;
@@ -146,15 +145,17 @@ function App() {
             if (e.target) {
                 if (typeof e.target.result === "string") {
                     console.log("e.target.result", JSON.parse(e.target.result));
-                    setActivities([...JSON.parse(e.target.result)]);
+                    setAffairs({...JSON.parse(e.target.result)});
                     setToLocaleStorage();
                 }
             }
         };
     };
-    const [open, setOpen] = React.useState(false);
-    const handleOpen = () => setOpen(true);
-    const handleClose = () => setOpen(false);
+    const changeAffairs = (title: string) => {
+        setChosenAffairs(title);
+        setFunny(null);
+        setResult(null);
+    }
     const darkTheme = createTheme({
         palette: {
             mode: 'dark',
@@ -167,37 +168,15 @@ function App() {
                 <Grid container spacing={2} sx={{
                     padding: '8px',
                 }}>
-                    {activities.map((el, i) => {
-                        const onChangeItemStatusHandler = (e: ChangeEvent<HTMLInputElement>) => {
-                            onChangeItemStatus(el.id, e.currentTarget.checked);
-                        }
-                        return <Grid item xs={2} key={el.id}>
-                            <Paper sx={{
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                alignItems: 'center',
-                                backgroundColor: '#1A2027',
-                                padding: '5px 0',
-                            }}
-                                   className={(el.isDone ? s.isDone : '') + (i === funny ? 'MuiPaper-root' : '')}
-                                   style={i === funny ? {backgroundColor: "deeppink"} : {}}
-                            >
-                                <Checkbox
-                                    onChange={onChangeItemStatusHandler}
-                                    checked={el.isDone}
-                                />
-                                <Avatar>
-                                    {el.owner === 'Ксюша' ? <FaceRetouchingNaturalIcon/> : <BoyIcon/>}
-                                </Avatar>
-                                <Typography margin={"auto"} align={"center"}>{el.name}</Typography>
-                                <Typography margin={"auto"} align={"right"}>{el.counter}</Typography>
-                                <IconButton
-                                    size={'small'}
-                                    onClick={() => removeItem(el.id)}>
-                                    <Delete/>
-                                </IconButton>
-                            </Paper>
-                        </Grid>
+                    {affairs[chosenAffairs].map((el, i) => {
+                        return <Affair
+                            key={el.id}
+                            affair={el}
+                            removeItem={removeItem}
+                            index={i}
+                            onChangeItemStatus={onChangeItemStatus}
+                            funny={funny}
+                        />
                     })}
                 </Grid>
                 <div className={s.container}>
@@ -206,25 +185,11 @@ function App() {
                         id="standard-basic"
                         label="Activity"
                         variant="standard"
-                        value={inputActivityValue}
-                        onChange={onChangeActivityHandler}
+                        value={inputAffairValue}
+                        onChange={onChangeAffairHandler}
                         helperText={error}
                         fullWidth
                     />
-                    <FormControl fullWidth margin="normal">
-                        <InputLabel id="demo-simple-select-label">Owner</InputLabel>
-                        <Select
-                            error={error ? true : false}
-                            labelId="demo-simple-select-label"
-                            id="demo-simple-select"
-                            value={inputOwnerValue}
-                            label="Owner"
-                            onChange={onChangeOwnerHandler}
-                        >
-                            <MenuItem value={'Ксюша'}>Ксюша</MenuItem>
-                            <MenuItem value={'Ваня'}>Ваня</MenuItem>
-                        </Select>
-                    </FormControl>
                     <Button onClick={() => addNew()}>
                         Добавить
                     </Button>
@@ -238,11 +203,6 @@ function App() {
                         {result
                             ? <List>
                                 <ListItem key={result.id}>
-                                    <ListItemAvatar>
-                                        <Avatar>
-                                            {result.owner === 'Ксюша' ? <FaceRetouchingNaturalIcon/> : <BoyIcon/>}
-                                        </Avatar>
-                                    </ListItemAvatar>
                                     <ListItemText primary={result.name}></ListItemText>
                                 </ListItem>
                             </List>
@@ -250,6 +210,9 @@ function App() {
                         }
                     </div>
                 </Paper>
+                <ChangeItemForm
+                    changeAffairs={changeAffairs}
+                />
             </Box>
             <BasicModal>
                 <div className={s.container}>
@@ -262,4 +225,5 @@ function App() {
         </ThemeProvider>
     )
 }
+
 export default App;
