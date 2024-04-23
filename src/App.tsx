@@ -198,7 +198,7 @@ function App() {
                     margin: '10px auto'
                 }} elevation={5}>
                     <div className={s.container}>
-                        <Button onClick={randomizer}>Хоть бы вовка</Button>
+                        <Button onClick={randomizer}>Клик</Button>
                         {result
                             ? <List>
                                 <ListItem key={result.id}>
